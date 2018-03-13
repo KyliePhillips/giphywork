@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title> Your Magical Girl</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <!-- Rendered buttons will get dumped Here  -->
+  <div id= "bestGirlbuttons-view">
+
+  </div>
+  <form id="bestGirl-form">
+    <label for="bestGirl-input"> Add Your Anime Magical Girl!</label>
+    <input type="text" id="bestGirl-input"><br>
+
+    <!-- Button triggers new anime girl to be added -->
+    <input id="add-bestGirl" type="submit" value="Add Your Anime Best Girl">
+  </form>
+
+  <!--Best-Girl's will be dropped off here -->
+  <div id="bestGirlsbuttons-view"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    //Initial Array of BestGirl -->
+  var bestGirls = ["Sailor Moon","Sailor Venus","Sailor Mars","Kill La Kill","Cardcaptor Sakura","Puella Magi Madoka Magica","Princess TuTu"];
+  
+  // displaybestGirl function re-renders the HTML to display the appropriate content
+  function displayBestGirl(){
+
+    var bestGirl = $(this).attr("data-name");
+    var queryURL = "https://api.giphy.com/v1/gifs/search?api_key=SwUA37Tbfy2urH5FFPDTwo64p36ZGL3H&q=&limit=10&offset=0&rating=PG-13&lang=en";
+   
+    //Creates AJAX call for the specific bestGirl being clicked
+    $.ajax({
+      url: queryURL,
+      method: "GET"
+    }).then(function(response){
+      console.log(response);
+      console.log(response.Runtime);
+
+      // Div for content
+      var bestGirlDiv = $("<div>");
+      //Give div Title
+      bestGirlDiv.after("<h2>" + response.Title + "</h2>");
+      // Give rating
+      bestGirlDiv.after("<p>" + response.Rated + "</p>");
+
+      //Create Image
+      var gifImg = $("<img>");
+      // IF I had a predefined class to style it
+      gifImg.addClass("myClassName");
+      // Give image src attribute
+      gifImg.attr("src", response.Title);
+      //Give image alt attribute
+      gifImg.attr("alt", response.Rated)
+      // Add image to div
+      bestGirlDiv.after(gifImg);
+
+      //Add div above previous content in bestGirlbuttons-view
+      $("#bestGirlsbuttons-view").prepend(bestGirlDiv);
+
+    });
+  }
+
+  //Function for displaying BestGirl data
+  function renderButtons() {
+
+    //Deletes the bestGirl prior to adding new bestGirls
+    //(this is neccessary to not repeat buttons)
+    $("#bestGirlsbuttons-view").empty();
+
+    //Loops through my array of bestGirls
+    for (var i = 0; i < bestGirls.length; i++) {
+      
+      //This will dynamically generate buttons for each bestGirl
+      //This code $("<button>") is all jQuery needs to create the beginning and end tag (<button></button>)
+      var a = $("<button>");
+      //Adds a class of bestGirl to our button
+      a.addClass("bestGirl");
+      //Added a data-attribute
+      a.attr("data-name", bestGirls[i]);
+      //Provided the initial button text
+      a.text(bestGirls[i]);
+      //Added the button to the buttons-view div
+      $("#bestGirlsbuttons-view").after(a);
+    }
+  }
+
+  //This function handles events where the add bestGirls button is
+  $("#add-bestGirl").on("click", function(event){
+    event.preventDefault();
+    // This line of code will grab the input from our text box
+    var bestGirl = $("#bestGirl-input").val().trim();
+
+    // The bestGirl from the textbox is then added to our array
+    bestGirls.push(bestGirl);
+
+    // Calling renderbuttons to handle the processing of our bestGirls array
+    renderButtons();
+
+  });
+
+
+  //Adding click event listeners to all elements with a class of bestGirl
+  $(document).on("click", ".bestGirl", displayBestGirl);
+
+  // Calling the renderButtons function to display initial buttons
+  renderButtons();
+  </script>
+
+</body>
